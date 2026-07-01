@@ -1,74 +1,133 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>장호 사진 접수</title>
+<meta charset="UTF-8">
 
-  <link rel="stylesheet" href="style.css" />
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1,
+maximum-scale=1,
+user-scalable=no">
 
-  <script type="module" src="firebase.js"></script>
-  <script type="module" src="app.js"></script>
+<title>장호 사진 접수</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- ExcelJS -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+
+<!-- FileSaver -->
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+
 </head>
 
 <body>
-  <div class="app">
-    <h1>장호 사진 접수</h1>
 
-    <section class="card camera-card">
-      <label class="photo-label">1. 사진 먼저 찍기</label>
+<div class="container">
 
-      <input
-        id="photoInput"
-        class="hidden-input"
-        type="file"
-        accept="image/*"
-        capture="environment"
-      />
+<h1>📸 장호 사진 접수</h1>
 
-      <button id="photoBtn" class="photo-btn" type="button">
-        📷 사진 찍기
-      </button>
+<div class="card">
 
-      <img id="preview" class="preview hidden" alt="사진 미리보기" />
-    </section>
+<button id="cameraBtn">
 
-    <section id="formCard" class="card form-card disabled">
-      <label>2. 성함</label>
-      <input id="nameInput" type="text" placeholder="예: 김영자" />
+📷 사진 찍기
 
-      <label>3. 마을</label>
-      <div class="village-grid">
-        <button type="button" data-village="장호1리">장호1리</button>
-        <button type="button" data-village="장호2리">장호2리</button>
-        <button type="button" data-village="용화1리">용화1리</button>
-        <button type="button" data-village="용화2리">용화2리</button>
-      </div>
+</button>
 
-      <label>4. 도로명</label>
-      <select id="roadSelect">
-        <option value="">마을을 먼저 선택하세요</option>
-      </select>
+<input
+id="photoInput"
+type="file"
+accept="image/*"
+capture="environment"
+hidden>
 
-      <label>5. 상세주소</label>
-      <input id="detailInput" type="text" placeholder="예: 12-3, 101호" />
+<img
+id="preview"
+class="hidden">
 
-      <button id="saveBtn" class="save" type="button">저장</button>
+</div>
 
-      <p id="status"></p>
-    </section>
+<div class="card">
 
-    <section class="card">
-      <div class="top-row">
-        <h2>저장 목록</h2>
-        <button id="csvBtn" type="button">CSV</button>
-      </div>
+<label>성함</label>
 
-      <input id="searchInput" type="text" placeholder="이름 검색" />
+<input
+id="nameInput"
+placeholder="성함 입력">
 
-      <div id="list"></div>
-    </section>
-  </div>
+<label>마을</label>
+
+<div class="villages">
+
+<button data-village="장호1리">장호1리</button>
+
+<button data-village="장호2리">장호2리</button>
+
+<button data-village="용화1리">용화1리</button>
+
+<button data-village="용화2리">용화2리</button>
+
+</div>
+
+<label>도로명</label>
+
+<select id="roadSelect">
+
+<option value="">
+도로명 선택
+</option>
+
+</select>
+
+<label>상세주소</label>
+
+<input
+id="detailInput"
+placeholder="예) 15-3">
+
+<button id="saveBtn">
+
+저장
+
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="toolbar">
+
+<input
+id="searchInput"
+placeholder="이름 검색">
+
+<button id="excelBtn">
+
+📄 엑셀 저장
+
+</button>
+
+</div>
+
+<div id="count">
+
+0명 저장됨
+
+</div>
+
+<div id="list">
+
+</div>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
 </body>
+
 </html>

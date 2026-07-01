@@ -1,224 +1,326 @@
-* {
-  box-sizing: border-box;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f5f6f8;
-  color: #222;
+body{
+    background:#f3f5f7;
+    color:#222;
 }
 
-body {
-  display: flex;
-  justify-content: center;
+.container{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+    padding:18px;
 }
 
-.app {
-  width: 100%;
-  max-width: 520px;
-  padding: 16px;
+h1{
+    text-align:center;
+    margin:12px 0 22px;
+    font-size:30px;
+    font-weight:800;
 }
 
-h1 {
-  text-align: center;
-  margin: 8px 0 18px;
-  font-size: 30px;
+.card{
+    background:#fff;
+    border-radius:20px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
-.card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 18px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+#cameraBtn{
+
+    width:100%;
+    height:72px;
+
+    border:none;
+    border-radius:18px;
+
+    background:#111;
+
+    color:#fff;
+
+    font-size:23px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.15s;
 }
 
-.camera-card {
-  text-align: center;
+#cameraBtn:active{
+
+    transform:scale(.98);
+
 }
 
-.photo-label {
-  text-align: left;
+#preview{
+
+    width:100%;
+
+    margin-top:18px;
+
+    border-radius:18px;
+
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+
 }
 
-.hidden-input {
-  display: none;
+.hidden{
+
+    display:none;
+
 }
 
-.photo-btn {
-  width: 100%;
-  padding: 28px 18px;
-  border: none;
-  border-radius: 20px;
-  background: #111;
-  color: white;
-  font-size: 25px;
-  font-weight: 900;
-}
+label{
 
-.preview {
-  width: 100%;
-  margin-top: 16px;
-  border-radius: 18px;
-  box-shadow: 0 8px 22px rgba(0,0,0,.18);
-}
+    display:block;
 
-.hidden {
-  display: none;
-}
+    margin-top:18px;
+    margin-bottom:8px;
 
-.form-card.disabled {
-  opacity: 0.42;
-}
+    font-weight:700;
 
-.form-card.disabled input,
-.form-card.disabled select,
-.form-card.disabled button {
-  pointer-events: none;
-}
-
-label {
-  display: block;
-  margin-top: 17px;
-  margin-bottom: 8px;
-  font-size: 17px;
-  font-weight: 800;
 }
 
 input,
-select {
-  width: 100%;
-  padding: 15px;
-  border: 2px solid #e3e3e3;
-  border-radius: 14px;
-  font-size: 18px;
-  outline: none;
-  background: white;
+select{
+
+    width:100%;
+
+    height:54px;
+
+    border:2px solid #ddd;
+
+    border-radius:14px;
+
+    padding:0 15px;
+
+    font-size:17px;
+
+    outline:none;
+
 }
 
 input:focus,
-select:focus {
-  border-color: #2f80ed;
+select:focus{
+
+    border-color:#3b82f6;
+
 }
 
-.village-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.villages{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
 }
 
-.village-grid button {
-  border: none;
-  border-radius: 14px;
-  background: #eceff3;
-  padding: 16px;
-  font-size: 17px;
-  font-weight: 800;
+.villages button{
+
+    height:54px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#e8ecf1;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.15s;
+
 }
 
-.village-grid button.active {
-  background: #2f80ed;
-  color: #fff;
+.villages button.active{
+
+    background:#3b82f6;
+
+    color:#fff;
+
 }
 
-.save {
-  width: 100%;
-  margin-top: 20px;
-  padding: 18px;
-  border: none;
-  border-radius: 16px;
-  background: #111;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 900;
+#saveBtn{
+
+    width:100%;
+
+    height:60px;
+
+    margin-top:22px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#111;
+
+    color:#fff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
 }
 
-.save:disabled {
-  background: #999;
+#saveBtn:active{
+
+    transform:scale(.98);
+
 }
 
-#status {
-  margin-top: 12px;
-  text-align: center;
-  color: #2f80ed;
-  font-weight: 800;
+.toolbar{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:14px;
+
 }
 
-.top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+#searchInput{
+
+    flex:1;
+
 }
 
-.top-row h2 {
-  margin: 0;
+#excelBtn{
+
+    width:120px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#1d9f53;
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
 }
 
-#csvBtn {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 15px;
-  background: #2f80ed;
-  color: #fff;
-  font-weight: 800;
+#count{
+
+    font-weight:700;
+
+    color:#666;
+
+    margin-bottom:12px;
+
 }
 
-#searchInput {
-  margin-bottom: 18px;
+.item{
+
+    background:#fafafa;
+
+    border:1px solid #ececec;
+
+    border-radius:16px;
+
+    padding:14px;
+
+    margin-bottom:15px;
+
 }
 
-.item {
-  border-top: 1px solid #ececec;
-  padding: 18px 0;
+.item img{
+
+    width:100%;
+
+    border-radius:14px;
+
+    margin-top:12px;
+
 }
 
-.item:first-child {
-  border-top: none;
+.item h3{
+
+    margin-bottom:8px;
+
+    font-size:20px;
+
 }
 
-.item strong {
-  display: block;
-  font-size: 20px;
+.item p{
+
+    margin:4px 0;
+
+    color:#555;
+
 }
 
-.item p {
-  margin: 6px 0;
-  color: #666;
-  font-size: 15px;
+.itemButtons{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:12px;
+
 }
 
-.item img {
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 14px;
-  box-shadow: 0 5px 15px rgba(0,0,0,.15);
+.itemButtons button{
+
+    flex:1;
+
+    height:45px;
+
+    border:none;
+
+    border-radius:12px;
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
 }
 
-.empty {
-  text-align: center;
-  color: #999;
-  padding: 30px 0;
+.editBtn{
+
+    background:#3b82f6;
+
 }
 
-@media(max-width:520px) {
-  .app {
-    padding: 12px;
-  }
+.deleteBtn{
 
-  h1 {
-    font-size: 26px;
-  }
+    background:#ef4444;
 
-  .card {
-    padding: 16px;
-  }
+}
 
-  .photo-btn {
-    font-size: 23px;
-    padding: 26px 16px;
-  }
+@media(max-width:520px){
+
+    .container{
+
+        padding:12px;
+
+    }
+
+    h1{
+
+        font-size:27px;
+
+    }
+
 }

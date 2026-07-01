@@ -1,301 +1,418 @@
-import {
-  saveRecord,
-  loadRecords,
-  uploadImage
-} from "./firebase.js";
+const STORAGE_KEY = "jangho_records_v1";
 
 const ADDRESS_DATA = {
-  "장호1리": [
-    "갈남길",
-    "장호1길",
-    "장호안1길",
-    "장호안2길",
-    "장호안3길",
-    "장호항길",
-    "삼척로"
-  ],
-
-  "장호2리": [
-    "장호길",
-    "장호2길",
-    "장호안길",
-    "장호항길",
-    "삼척로"
-  ],
-
-  "용화1리": [
-    "용화길",
-    "용화안길",
-    "용화해변길",
-    "삼척로"
-  ],
-
-  "용화2리": [
-    "용화해변1길",
-    "용화해변2길",
-    "용화길",
-    "삼척로"
-  ]
+  "장호1리": ["장호항길", "장호1길", "장호안길", "삼척로"],
+  "장호2리": ["장호길", "장호2길", "삼척로"],
+  "용화1리": ["용화길", "용화안길", "용화해변길", "삼척로"],
+  "용화2리": ["용화해변1길", "용화해변2길", "삼척로"]
 };
 
-const photoBtn = document.getElementById("photoBtn");
+const cameraBtn = document.getElementById("cameraBtn");
 const photoInput = document.getElementById("photoInput");
 const preview = document.getElementById("preview");
-const formCard = document.getElementById("formCard");
 
 const nameInput = document.getElementById("nameInput");
 const roadSelect = document.getElementById("roadSelect");
 const detailInput = document.getElementById("detailInput");
+
 const saveBtn = document.getElementById("saveBtn");
-const csvBtn = document.getElementById("csvBtn");
-const list = document.getElementById("list");
-const statusEl = document.getElementById("status");
+const excelBtn = document.getElementById("excelBtn");
+
 const searchInput = document.getElementById("searchInput");
+const list = document.getElementById("list");
+const count = document.getElementById("count");
 
-let selectedVillage = "";
-let selectedFile = null;
-let records = [];
+let records =
+JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-init();
+let currentVillage = "";
+let editingId = null;
+let currentPhoto = "";
 
-function init() {
-  bindPhoto();
-  bindVillageButtons();
-  bindSave();
-  bindCSV();
-  bindSearch();
-  refreshRecords();
-}
+render();
 
-function bindPhoto() {
-  photoBtn.addEventListener("click", () => {
-    photoInput.click();
-  });
+cameraBtn.onclick = () => photoInput.click();
 
-  photoInput.addEventListener("change", () => {
-    const file = photoInput.files[0];
+photoInput.onchange = e => {
 
-    if (!file) return;
+    const file = e.target.files[0];
 
-    selectedFile = file;
+    if(!file) return;
 
-    preview.src = URL.createObjectURL(file);
-    preview.classList.remove("hidden");
+    const reader = new FileReader();
 
-    formCard.classList.remove("disabled");
+    reader.onload = ev => {
 
-    setTimeout(() => {
-      nameInput.focus();
-      formCard.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, 200);
-  });
-}
+        currentPhoto = ev.target.result;
 
-function bindVillageButtons() {
-  document.querySelectorAll(".village-grid button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      selectedVillage = btn.dataset.village;
+        preview.src = currentPhoto;
 
-      document.querySelectorAll(".village-grid button").forEach(b => {
-        b.classList.remove("active");
-      });
+        preview.classList.remove("hidden");
 
-      btn.classList.add("active");
-      renderRoads();
+    };
+
+    reader.readAsDataURL(file);
+
+};
+
+document
+.querySelectorAll(".villages button")
+.forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        document
+        .querySelectorAll(".villages button")
+        .forEach(b=>b.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        currentVillage=btn.dataset.village;
+
+        renderRoads();
+
+    }
+
+});
+
+function renderRoads(){
+
+    roadSelect.innerHTML="";
+
+    ADDRESS_DATA[currentVillage].forEach(road=>{
+
+        const option=document.createElement("option");
+
+        option.value=road;
+
+        option.textContent=road;
+
+        roadSelect.appendChild(option);
+
     });
-  });
+
 }
 
-function renderRoads() {
-  roadSelect.innerHTML = "";
+saveBtn.onclick=()=>{
 
-  ADDRESS_DATA[selectedVillage].forEach(road => {
-    const option = document.createElement("option");
-    option.value = road;
-    option.textContent = road;
-    roadSelect.appendChild(option);
-  });
-}
+    if(!currentPhoto){
 
-function bindSave() {
-  saveBtn.addEventListener("click", async () => {
-    const name = nameInput.value.trim();
-    const road = roadSelect.value;
-    const detail = detailInput.value.trim();
+        alert("사진을 먼저 촬영하세요.");
 
-    if (!selectedFile) return alert("사진을 먼저 촬영하세요.");
-    if (!name) return alert("성함을 입력하세요.");
-    if (!selectedVillage) return alert("마을을 선택하세요.");
-    if (!road) return alert("도로명을 선택하세요.");
+        return;
 
-    try {
-      saveBtn.disabled = true;
-      saveBtn.textContent = "저장 중...";
-      statusEl.textContent = "사진 업로드 중...";
-
-      const imageUrl = await uploadImage(selectedFile);
-
-      statusEl.textContent = "정보 저장 중...";
-
-      await saveRecord({
-        name,
-        village: selectedVillage,
-        road,
-        detail,
-        imageUrl
-      });
-
-      statusEl.textContent = "저장 완료";
-
-      resetForm();
-      await refreshRecords();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-    } catch (err) {
-      console.error(err);
-      alert("저장 실패: Firebase 설정이나 규칙을 확인하세요.");
-      statusEl.textContent = "저장 실패";
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.textContent = "저장";
-    }
-  });
-}
-
-function resetForm() {
-  selectedFile = null;
-  selectedVillage = "";
-
-  photoInput.value = "";
-  preview.src = "";
-  preview.classList.add("hidden");
-
-  nameInput.value = "";
-  detailInput.value = "";
-
-  roadSelect.innerHTML = `<option value="">마을을 먼저 선택하세요</option>`;
-
-  document.querySelectorAll(".village-grid button").forEach(btn => {
-    btn.classList.remove("active");
-  });
-
-  formCard.classList.add("disabled");
-}
-
-async function refreshRecords() {
-  try {
-    records = await loadRecords();
-    renderList(records);
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = "목록 불러오기 실패";
-  }
-}
-
-function renderList(data) {
-  list.innerHTML = "";
-
-  if (data.length === 0) {
-    list.innerHTML = `<p class="empty">저장된 기록이 없습니다.</p>`;
-    return;
-  }
-
-  data.forEach(record => {
-    const item = document.createElement("div");
-    item.className = "item";
-
-    const time = formatTime(record.createdAt);
-
-    item.innerHTML = `
-      <strong>${escapeHTML(record.name)}</strong>
-      <p>${escapeHTML(record.village)} ${escapeHTML(record.road)} ${escapeHTML(record.detail || "")}</p>
-      <p>${time}</p>
-      ${record.imageUrl ? `<img src="${record.imageUrl}" alt="사진">` : ""}
-    `;
-
-    list.appendChild(item);
-  });
-}
-
-function bindSearch() {
-  searchInput.addEventListener("input", () => {
-    const keyword = searchInput.value.trim();
-
-    if (!keyword) {
-      renderList(records);
-      return;
     }
 
-    const filtered = records.filter(r =>
-      String(r.name || "").includes(keyword) ||
-      String(r.village || "").includes(keyword) ||
-      String(r.road || "").includes(keyword) ||
-      String(r.detail || "").includes(keyword)
+    if(!nameInput.value.trim()){
+
+        alert("성함을 입력하세요.");
+
+        return;
+
+    }
+
+    if(!currentVillage){
+
+        alert("마을을 선택하세요.");
+
+        return;
+
+    }
+
+    const data={
+
+        id:editingId || Date.now(),
+
+        photo:currentPhoto,
+
+        name:nameInput.value.trim(),
+
+        village:currentVillage,
+
+        road:roadSelect.value,
+
+        detail:detailInput.value.trim(),
+
+        created:new Date().toLocaleString()
+
+    };
+
+    if(editingId){
+
+        const index=records.findIndex(r=>r.id===editingId);
+
+        records[index]=data;
+
+        editingId=null;
+
+        saveBtn.textContent="저장";
+
+    }else{
+
+        records.unshift(data);
+
+    }
+
+    saveStorage();
+
+    clearForm();
+
+    render();
+
+};
+
+function saveStorage(){
+
+    localStorage.setItem(
+
+        STORAGE_KEY,
+
+        JSON.stringify(records)
+
     );
 
-    renderList(filtered);
-  });
 }
 
-function bindCSV() {
-  csvBtn.addEventListener("click", () => {
-    const rows = [
-      ["성함", "마을", "도로명", "상세주소", "사진URL", "저장시간"],
-      ...records.map(r => [
-        r.name || "",
-        r.village || "",
-        r.road || "",
-        r.detail || "",
-        r.imageUrl || "",
-        formatTime(r.createdAt)
-      ])
-    ];
+function clearForm(){
 
-    const csv = rows
-      .map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(","))
-      .join("\n");
+    nameInput.value="";
 
-    const blob = new Blob(["\ufeff" + csv], {
-      type: "text/csv;charset=utf-8;"
+    detailInput.value="";
+
+    photoInput.value="";
+
+    preview.src="";
+
+    preview.classList.add("hidden");
+
+    currentPhoto="";
+
+    currentVillage="";
+
+    roadSelect.innerHTML="<option>도로명 선택</option>";
+
+    document
+    .querySelectorAll(".villages button")
+    .forEach(b=>b.classList.remove("active"));
+
+}
+
+searchInput.oninput=render;
+
+function render(){
+
+    const keyword=
+    searchInput.value.trim();
+
+    const filtered=
+
+    records.filter(r=>{
+
+        if(!keyword) return true;
+
+        return(
+
+            r.name.includes(keyword)||
+
+            r.village.includes(keyword)||
+
+            r.road.includes(keyword)||
+
+            r.detail.includes(keyword)
+
+        );
+
     });
 
-    const url = URL.createObjectURL(blob);
+    count.textContent=
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "jangho_records.csv";
-    a.click();
+    `${filtered.length}명 저장됨`;
 
-    URL.revokeObjectURL(url);
-  });
+    list.innerHTML="";
+
+    filtered.forEach(addCard);
+
 }
 
-function formatTime(timestamp) {
-  if (!timestamp) return "";
+function addCard(data){
 
-  try {
-    if (timestamp.toDate) {
-      return timestamp.toDate().toLocaleString("ko-KR");
+    const div=document.createElement("div");
+
+    div.className="item";
+
+    div.innerHTML=`
+
+    <h3>${data.name}</h3>
+
+    <p>${data.village}</p>
+
+    <p>${data.road} ${data.detail}</p>
+
+    <p>${data.created}</p>
+
+    <img src="${data.photo}">
+
+    <div class="itemButtons">
+
+        <button class="editBtn">
+
+        수정
+
+        </button>
+
+        <button class="deleteBtn">
+
+        삭제
+
+        </button>
+
+    </div>
+
+    `;
+    const editBtn = div.querySelector(".editBtn");
+    const deleteBtn = div.querySelector(".deleteBtn");
+
+    editBtn.onclick = () => {
+
+        editingId = data.id;
+
+        currentPhoto = data.photo;
+
+        preview.src = data.photo;
+        preview.classList.remove("hidden");
+
+        nameInput.value = data.name;
+        detailInput.value = data.detail;
+
+        currentVillage = data.village;
+
+        document
+            .querySelectorAll(".villages button")
+            .forEach(btn => {
+                btn.classList.toggle(
+                    "active",
+                    btn.dataset.village === currentVillage
+                );
+            });
+
+        renderRoads();
+
+        roadSelect.value = data.road;
+
+        saveBtn.textContent = "수정 저장";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    };
+
+    deleteBtn.onclick = () => {
+
+        if (!confirm(`${data.name} 님 정보를 삭제하시겠습니까?`))
+            return;
+
+        records = records.filter(r => r.id !== data.id);
+
+        saveStorage();
+
+        render();
+
+    };
+
+    list.appendChild(div);
+
+}
+
+/* ===========================
+   엑셀 저장
+=========================== */
+
+excelBtn.onclick = async () => {
+
+    if (records.length === 0) {
+        alert("저장된 데이터가 없습니다.");
+        return;
     }
 
-    return new Date(timestamp).toLocaleString("ko-KR");
-  } catch {
-    return "";
-  }
-}
+    const workbook = new ExcelJS.Workbook();
 
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+    const sheet = workbook.addWorksheet("장호");
+
+    sheet.columns = [
+        { header: "사진", key: "photo", width: 18 },
+        { header: "성함", key: "name", width: 15 },
+        { header: "마을", key: "village", width: 12 },
+        { header: "도로명", key: "road", width: 18 },
+        { header: "상세주소", key: "detail", width: 18 },
+        { header: "저장시간", key: "created", width: 24 }
+    ];
+
+    sheet.getRow(1).font = {
+        bold: true
+    };
+
+    let rowIndex = 2;
+
+    for (const r of records) {
+
+        sheet.getRow(rowIndex).height = 90;
+
+        sheet.getCell(`B${rowIndex}`).value = r.name;
+        sheet.getCell(`C${rowIndex}`).value = r.village;
+        sheet.getCell(`D${rowIndex}`).value = r.road;
+        sheet.getCell(`E${rowIndex}`).value = r.detail;
+        sheet.getCell(`F${rowIndex}`).value = r.created;
+
+        if (r.photo) {
+
+            const imageId = workbook.addImage({
+                base64: r.photo,
+                extension: "jpeg"
+            });
+
+            sheet.addImage(imageId, {
+                tl: {
+                    col: 0.15,
+                    row: rowIndex - 0.85
+                },
+                ext: {
+                    width: 90,
+                    height: 90
+                }
+            });
+
+        }
+
+        rowIndex++;
+
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    saveAs(
+        new Blob([
+            buffer
+        ]),
+        `장호사진_${new Date().toISOString().slice(0,10)}.xlsx`
+    );
+
+    alert("엑셀 저장 완료!");
+
+};
+
+/* ===========================
+   페이지 종료 경고
+=========================== */
+
+window.addEventListener("beforeunload", e => {
+
+    if (records.length === 0)
+        return;
+
+    e.preventDefault();
+
+    e.returnValue = "";
+
+});
