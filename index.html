@@ -5,11 +5,9 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1,
-maximum-scale=1,
-user-scalable=no">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>장호 사진 접수</title>
 
@@ -27,102 +25,116 @@ user-scalable=no">
 
 <div class="container">
 
-<h1>📸 장호 사진 접수</h1>
+    <h1>📸 장호 사진 접수</h1>
 
-<div class="card">
+    <!-- 사진 -->
+    <div class="card">
 
-<button id="cameraBtn">
+        <button id="cameraBtn">
 
-📷 사진 찍기
+            📷 사진 찍기
 
-</button>
+        </button>
 
-<input
-id="photoInput"
-type="file"
-accept="image/*"
-capture="environment"
-hidden>
+        <input
+            id="photoInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden>
 
-<img
-id="preview"
-class="hidden">
+        <img
+            id="preview"
+            class="hidden">
 
-</div>
+    </div>
 
-<div class="card">
+    <!-- 입력 -->
+    <div class="card">
 
-<label>성함</label>
+        <label>성함</label>
 
-<input
-id="nameInput"
-placeholder="성함 입력">
+        <input
+            id="nameInput"
+            type="text"
+            placeholder="성함 입력">
 
-<label>마을</label>
+        <label>마을</label>
 
-<div class="villages">
+        <div class="villages">
 
-<button data-village="장호1리">장호1리</button>
+            <button data-village="장호1리">
+                장호1리
+            </button>
 
-<button data-village="장호2리">장호2리</button>
+            <button data-village="장호2리">
+                장호2리
+            </button>
 
-<button data-village="용화1리">용화1리</button>
+            <button data-village="용화1리">
+                용화1리
+            </button>
 
-<button data-village="용화2리">용화2리</button>
+            <button data-village="용화2리">
+                용화2리
+            </button>
 
-</div>
+        </div>
 
-<label>도로명</label>
+        <label>도로명</label>
 
-<select id="roadSelect">
+        <select id="roadSelect">
 
-<option value="">
-도로명 선택
-</option>
+            <option value="">
+                도로명 선택
+            </option>
 
-</select>
+        </select>
 
-<label>상세주소</label>
+        <label>상세주소</label>
 
-<input
-id="detailInput"
-placeholder="예) 15-3">
+        <input
+            id="detailInput"
+            type="text"
+            placeholder="예) 15-3">
 
-<button id="saveBtn">
+        <button id="saveBtn">
 
-저장
+            저장
 
-</button>
+        </button>
 
-</div>
+    </div>
 
-<div class="card">
+    <!-- 목록 -->
+    <div class="card">
 
-<div class="toolbar">
+        <div class="toolbar">
 
-<input
-id="searchInput"
-placeholder="이름 검색">
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="이름 검색">
 
-<button id="excelBtn">
+            <button id="excelBtn">
 
-📄 엑셀 저장
+                📄 엑셀
 
-</button>
+            </button>
 
-</div>
+        </div>
 
-<div id="count">
+        <div id="count">
 
-0명 저장됨
+            0명 저장됨
 
-</div>
+        </div>
 
-<div id="list">
+        <div id="list">
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 

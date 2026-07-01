@@ -6,7 +6,7 @@
 }
 
 body{
-    background:#f3f5f7;
+    background:#eef2f5;
     color:#222;
 }
 
@@ -14,13 +14,13 @@ body{
     width:100%;
     max-width:520px;
     margin:auto;
-    padding:18px;
+    padding:16px;
 }
 
 h1{
     text-align:center;
-    margin:12px 0 22px;
     font-size:30px;
+    margin:10px 0 20px;
     font-weight:800;
 }
 
@@ -33,294 +33,202 @@ h1{
 }
 
 #cameraBtn{
-
     width:100%;
     height:72px;
-
     border:none;
     border-radius:18px;
-
     background:#111;
-
     color:#fff;
-
-    font-size:23px;
-    font-weight:700;
-
+    font-size:24px;
+    font-weight:800;
     cursor:pointer;
-
     transition:.15s;
 }
 
 #cameraBtn:active{
-
     transform:scale(.98);
-
 }
 
 #preview{
-
     width:100%;
-
     margin-top:18px;
-
     border-radius:18px;
-
-    box-shadow:0 8px 18px rgba(0,0,0,.18);
-
+    display:block;
 }
 
 .hidden{
-
-    display:none;
-
+    display:none!important;
 }
 
 label{
-
     display:block;
-
-    margin-top:18px;
-    margin-bottom:8px;
-
+    margin:18px 0 8px;
     font-weight:700;
-
+    font-size:17px;
 }
 
 input,
 select{
-
     width:100%;
-
     height:54px;
-
     border:2px solid #ddd;
-
     border-radius:14px;
-
-    padding:0 15px;
-
+    padding:0 14px;
     font-size:17px;
-
     outline:none;
-
+    background:#fff;
 }
 
 input:focus,
 select:focus{
-
-    border-color:#3b82f6;
-
+    border-color:#2d7ff9;
 }
 
 .villages{
-
     display:grid;
-
     grid-template-columns:1fr 1fr;
-
     gap:10px;
-
 }
 
 .villages button{
-
     height:54px;
-
     border:none;
-
     border-radius:14px;
-
-    background:#e8ecf1;
-
+    background:#eceff3;
     font-size:17px;
-
     font-weight:700;
-
     cursor:pointer;
-
     transition:.15s;
-
 }
 
 .villages button.active{
-
-    background:#3b82f6;
-
+    background:#2d7ff9;
     color:#fff;
-
 }
 
 #saveBtn{
-
     width:100%;
-
     height:60px;
-
     margin-top:22px;
-
     border:none;
-
     border-radius:16px;
-
     background:#111;
-
     color:#fff;
-
-    font-size:20px;
-
-    font-weight:700;
-
+    font-size:21px;
+    font-weight:800;
     cursor:pointer;
-
 }
 
 #saveBtn:active{
-
     transform:scale(.98);
-
 }
 
 .toolbar{
-
     display:flex;
-
     gap:10px;
-
-    margin-bottom:14px;
-
+    margin-bottom:15px;
 }
 
 #searchInput{
-
     flex:1;
-
 }
 
 #excelBtn{
-
-    width:120px;
-
+    width:110px;
     border:none;
-
     border-radius:14px;
-
-    background:#1d9f53;
-
+    background:#1aa552;
     color:#fff;
-
     font-size:17px;
-
-    font-weight:700;
-
+    font-weight:800;
     cursor:pointer;
-
 }
 
 #count{
-
+    font-size:15px;
     font-weight:700;
-
     color:#666;
-
     margin-bottom:12px;
-
 }
 
 .item{
-
-    background:#fafafa;
-
-    border:1px solid #ececec;
-
-    border-radius:16px;
-
+    border:1px solid #e7e7e7;
+    border-radius:18px;
     padding:14px;
-
-    margin-bottom:15px;
-
-}
-
-.item img{
-
-    width:100%;
-
-    border-radius:14px;
-
-    margin-top:12px;
-
+    margin-bottom:16px;
+    background:#fafafa;
 }
 
 .item h3{
-
-    margin-bottom:8px;
-
-    font-size:20px;
-
+    margin-bottom:6px;
+    font-size:21px;
 }
 
 .item p{
-
     margin:4px 0;
-
     color:#555;
+    font-size:15px;
+}
 
+.item img{
+    width:100%;
+    margin-top:12px;
+    border-radius:14px;
+    cursor:pointer;
 }
 
 .itemButtons{
-
     display:flex;
-
     gap:10px;
-
-    margin-top:12px;
-
+    margin-top:14px;
 }
 
 .itemButtons button{
-
     flex:1;
-
-    height:45px;
-
+    height:48px;
     border:none;
-
-    border-radius:12px;
-
+    border-radius:14px;
     color:#fff;
-
-    font-size:16px;
-
+    font-size:17px;
     font-weight:700;
-
     cursor:pointer;
-
 }
 
 .editBtn{
-
-    background:#3b82f6;
-
+    background:#2d7ff9;
 }
 
 .deleteBtn{
-
     background:#ef4444;
-
 }
 
-@media(max-width:520px){
+.empty{
+    text-align:center;
+    color:#999;
+    padding:30px;
+}
 
-    .container{
+@media (max-width:520px){
 
-        padding:12px;
+.container{
+    padding:12px;
+}
 
-    }
+h1{
+    font-size:26px;
+}
 
-    h1{
+.card{
+    padding:15px;
+}
 
-        font-size:27px;
+#cameraBtn{
+    height:64px;
+    font-size:22px;
+}
 
-    }
+#saveBtn{
+    height:56px;
+}
 
 }

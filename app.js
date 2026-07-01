@@ -1,10 +1,29 @@
-const STORAGE_KEY = "jangho_records_v1";
+const STORAGE_KEY = "jangho_records_v2";
 
 const ADDRESS_DATA = {
-  "장호1리": ["장호항길", "장호길", "장호1길", "장호2길", "장호안길", "장호안1길", "장호안2길", "삼척로"],
-  "장호2리": ["장호항길", "장호길", "장호1길", "장호2길", "장호안길", "장호안1길", "장호안2길", "삼척로"],
-  "용화1리": ["용화길", "용화안길", "용화해변길", "용화해변1길", "용화해변2길","삼척로"],
-  "용화2리": ["용화길", "용화안길", "용화해변길", "용화해변1길", "용화해변2길","삼척로"]
+  "장호1리": [
+    "장호항길",
+    "장호1길",
+    "장호안길",
+    "삼척로"
+  ],
+  "장호2리": [
+    "장호길",
+    "장호2길",
+    "삼척로"
+  ],
+  "용화1리": [
+    "용화길",
+    "용화안길",
+    "용화해변길",
+    "삼척로"
+  ],
+  "용화2리": [
+    "용화해변1길",
+    "용화해변2길",
+    "용화해변길",
+    "삼척로"
+  ]
 };
 
 const cameraBtn = document.getElementById("cameraBtn");
@@ -12,13 +31,14 @@ const photoInput = document.getElementById("photoInput");
 const preview = document.getElementById("preview");
 
 const nameInput = document.getElementById("nameInput");
-const roadSelect = document.getElementById("roadSelect");
 const detailInput = document.getElementById("detailInput");
+const roadSelect = document.getElementById("roadSelect");
 
 const saveBtn = document.getElementById("saveBtn");
 const excelBtn = document.getElementById("excelBtn");
 
 const searchInput = document.getElementById("searchInput");
+
 const list = document.getElementById("list");
 const count = document.getElementById("count");
 
@@ -26,12 +46,18 @@ let records =
 JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
 let currentVillage = "";
-let editingId = null;
+
 let currentPhoto = "";
+
+let editingId = null;
 
 render();
 
-cameraBtn.onclick = () => photoInput.click();
+cameraBtn.onclick = () => {
+
+    photoInput.click();
+
+};
 
 photoInput.onchange = e => {
 
@@ -39,19 +65,15 @@ photoInput.onchange = e => {
 
     if(!file) return;
 
-    const reader = new FileReader();
+    compressImage(file,1000,0.75).then(base64=>{
 
-    reader.onload = ev => {
+        currentPhoto = base64;
 
-        currentPhoto = ev.target.result;
-
-        preview.src = currentPhoto;
+        preview.src = base64;
 
         preview.classList.remove("hidden");
 
-    };
-
-    reader.readAsDataURL(file);
+    });
 
 };
 
@@ -67,11 +89,11 @@ document
 
         btn.classList.add("active");
 
-        currentVillage=btn.dataset.village;
+        currentVillage = btn.dataset.village;
 
         renderRoads();
 
-    }
+    };
 
 });
 
@@ -95,15 +117,15 @@ function renderRoads(){
 
 saveBtn.onclick=()=>{
 
-    if(!currentPhoto){
+    if(currentPhoto===""){
 
-        alert("사진을 먼저 촬영하세요.");
+        alert("사진을 먼저 찍어주세요.");
 
         return;
 
     }
 
-    if(!nameInput.value.trim()){
+    if(nameInput.value.trim()===""){
 
         alert("성함을 입력하세요.");
 
@@ -111,7 +133,7 @@ saveBtn.onclick=()=>{
 
     }
 
-    if(!currentVillage){
+    if(currentVillage===""){
 
         alert("마을을 선택하세요.");
 
@@ -139,7 +161,8 @@ saveBtn.onclick=()=>{
 
     if(editingId){
 
-        const index=records.findIndex(r=>r.id===editingId);
+        const index=
+        records.findIndex(r=>r.id===editingId);
 
         records[index]=data;
 
@@ -175,21 +198,23 @@ function saveStorage(){
 
 function clearForm(){
 
+    currentPhoto="";
+
+    currentVillage="";
+
+    editingId=null;
+
     nameInput.value="";
 
     detailInput.value="";
 
-    photoInput.value="";
+    roadSelect.innerHTML="<option>도로명 선택</option>";
 
     preview.src="";
 
     preview.classList.add("hidden");
 
-    currentPhoto="";
-
-    currentVillage="";
-
-    roadSelect.innerHTML="<option>도로명 선택</option>";
+    photoInput.value="";
 
     document
     .querySelectorAll(".villages button")
@@ -205,10 +230,9 @@ function render(){
     searchInput.value.trim();
 
     const filtered=
-
     records.filter(r=>{
 
-        if(!keyword) return true;
+        if(keyword==="") return true;
 
         return(
 
@@ -225,7 +249,6 @@ function render(){
     });
 
     count.textContent=
-
     `${filtered.length}명 저장됨`;
 
     list.innerHTML="";
@@ -242,13 +265,15 @@ function addCard(data){
 
     div.innerHTML=`
 
-    <h3>${data.name}</h3>
+    <h3>${escapeHtml(data.name)}</h3>
 
-    <p>${data.village}</p>
+    <p><b>${data.village}</b></p>
 
     <p>${data.road} ${data.detail}</p>
 
-    <p>${data.created}</p>
+    <p style="color:#888;font-size:14px;">
+    ${data.created}
+    </p>
 
     <img src="${data.photo}">
 
@@ -269,51 +294,70 @@ function addCard(data){
     </div>
 
     `;
-    const editBtn = div.querySelector(".editBtn");
-    const deleteBtn = div.querySelector(".deleteBtn");
 
-    editBtn.onclick = () => {
+    const img=div.querySelector("img");
 
-        editingId = data.id;
+    img.onclick=()=>{
 
-        currentPhoto = data.photo;
+        window.open(data.photo);
 
-        preview.src = data.photo;
+    };
+
+    div
+    .querySelector(".editBtn")
+    .onclick=()=>{
+
+        editingId=data.id;
+
+        currentPhoto=data.photo;
+
+        preview.src=data.photo;
+
         preview.classList.remove("hidden");
 
-        nameInput.value = data.name;
-        detailInput.value = data.detail;
+        nameInput.value=data.name;
 
-        currentVillage = data.village;
+        detailInput.value=data.detail;
+
+        currentVillage=data.village;
 
         document
-            .querySelectorAll(".villages button")
-            .forEach(btn => {
-                btn.classList.toggle(
-                    "active",
-                    btn.dataset.village === currentVillage
-                );
-            });
+        .querySelectorAll(".villages button")
+        .forEach(btn=>{
+
+            btn.classList.toggle(
+                "active",
+                btn.dataset.village===currentVillage
+            );
+
+        });
 
         renderRoads();
 
-        roadSelect.value = data.road;
+        roadSelect.value=data.road;
 
-        saveBtn.textContent = "수정 저장";
+        saveBtn.textContent="수정 저장";
 
         window.scrollTo({
-            top: 0,
-            behavior: "smooth"
+
+            top:0,
+
+            behavior:"smooth"
+
         });
 
     };
 
-    deleteBtn.onclick = () => {
+    div
+    .querySelector(".deleteBtn")
+    .onclick=()=>{
 
-        if (!confirm(`${data.name} 님 정보를 삭제하시겠습니까?`))
-            return;
+        if(!confirm(
+            `${data.name}님 정보를 삭제할까요?`
+        )) return;
 
-        records = records.filter(r => r.id !== data.id);
+        records=
+        records.filter(r=>r.id!==data.id);
 
         saveStorage();
 
@@ -325,94 +369,270 @@ function addCard(data){
 
 }
 
+function escapeHtml(text){
+
+    return String(text)
+
+    .replaceAll("&","&amp;")
+
+    .replaceAll("<","&lt;")
+
+    .replaceAll(">","&gt;")
+
+    .replaceAll('"',"&quot;")
+
+    .replaceAll("'","&#039;");
+
+}
+
+function compressImage(
+
+    file,
+
+    maxWidth,
+
+    quality
+
+){
+
+    return new Promise(resolve=>{
+
+        const reader=new FileReader();
+
+        reader.onload=e=>{
+
+            const img=new Image();
+
+            img.onload=()=>{
+
+                const scale=
+
+                Math.min(
+
+                    1,
+
+                    maxWidth/img.width
+
+                );
+
+                const canvas=
+
+                document.createElement("canvas");
+
+                canvas.width=
+
+                img.width*scale;
+
+                canvas.height=
+
+                img.height*scale;
+
+                const ctx=
+
+                canvas.getContext("2d");
+
+                ctx.drawImage(
+
+                    img,
+
+                    0,
+
+                    0,
+
+                    canvas.width,
+
+                    canvas.height
+
+                );
+
+                resolve(
+
+                    canvas.toDataURL(
+
+                        "image/jpeg",
+
+                        quality
+
+                    )
+
+                );
+
+            };
+
+            img.src=e.target.result;
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
 /* ===========================
-   엑셀 저장
+   Excel 저장
 =========================== */
 
 excelBtn.onclick = async () => {
 
-    if (records.length === 0) {
+    if(records.length===0){
+
         alert("저장된 데이터가 없습니다.");
+
         return;
+
     }
 
-    const workbook = new ExcelJS.Workbook();
+    const workbook=new ExcelJS.Workbook();
 
-    const sheet = workbook.addWorksheet("장호");
+    const sheet=workbook.addWorksheet("장호");
 
-    sheet.columns = [
-        { header: "사진", key: "photo", width: 18 },
-        { header: "성함", key: "name", width: 15 },
-        { header: "마을", key: "village", width: 12 },
-        { header: "도로명", key: "road", width: 18 },
-        { header: "상세주소", key: "detail", width: 18 },
-        { header: "저장시간", key: "created", width: 24 }
+    sheet.columns=[
+
+        {header:"사진",width:18},
+
+        {header:"성함",width:15},
+
+        {header:"마을",width:12},
+
+        {header:"도로명",width:18},
+
+        {header:"상세주소",width:18},
+
+        {header:"저장시간",width:25}
+
     ];
 
-    sheet.getRow(1).font = {
-        bold: true
+    sheet.getRow(1).font={
+
+        bold:true,
+
+        size:13
+
     };
 
-    let rowIndex = 2;
+    let row=2;
 
-    for (const r of records) {
+    for(const item of records){
 
-        sheet.getRow(rowIndex).height = 90;
+        sheet.getRow(row).height=90;
 
-        sheet.getCell(`B${rowIndex}`).value = r.name;
-        sheet.getCell(`C${rowIndex}`).value = r.village;
-        sheet.getCell(`D${rowIndex}`).value = r.road;
-        sheet.getCell(`E${rowIndex}`).value = r.detail;
-        sheet.getCell(`F${rowIndex}`).value = r.created;
+        sheet.getCell(`B${row}`).value=item.name;
 
-        if (r.photo) {
+        sheet.getCell(`C${row}`).value=item.village;
 
-            const imageId = workbook.addImage({
-                base64: r.photo,
-                extension: "jpeg"
+        sheet.getCell(`D${row}`).value=item.road;
+
+        sheet.getCell(`E${row}`).value=item.detail;
+
+        sheet.getCell(`F${row}`).value=item.created;
+
+        if(item.photo){
+
+            const imageId=
+
+            workbook.addImage({
+
+                base64:item.photo,
+
+                extension:"jpeg"
+
             });
 
-            sheet.addImage(imageId, {
-                tl: {
-                    col: 0.15,
-                    row: rowIndex - 0.85
-                },
-                ext: {
-                    width: 90,
-                    height: 90
+            sheet.addImage(
+
+                imageId,
+
+                {
+
+                    tl:{
+
+                        col:0.15,
+
+                        row:row-0.85
+
+                    },
+
+                    ext:{
+
+                        width:90,
+
+                        height:90
+
+                    }
+
                 }
-            });
+
+            );
 
         }
 
-        rowIndex++;
+        row++;
 
     }
 
-    const buffer = await workbook.xlsx.writeBuffer();
+    const buffer=
+
+    await workbook.xlsx.writeBuffer();
 
     saveAs(
-        new Blob([
-            buffer
-        ]),
-        `장호사진_${new Date().toISOString().slice(0,10)}.xlsx`
+
+        new Blob([buffer]),
+
+        `장호사진_${todayString()}.xlsx`
+
     );
 
     alert("엑셀 저장 완료!");
 
 };
 
+
 /* ===========================
-   페이지 종료 경고
+   날짜
 =========================== */
 
-window.addEventListener("beforeunload", e => {
+function todayString(){
 
-    if (records.length === 0)
+    const d=new Date();
+
+    const y=d.getFullYear();
+
+    const m=String(
+
+        d.getMonth()+1
+
+    ).padStart(2,"0");
+
+    const day=String(
+
+        d.getDate()
+
+    ).padStart(2,"0");
+
+    return `${y}-${m}-${day}`;
+
+}
+
+
+/* ===========================
+   종료 경고
+=========================== */
+
+window.addEventListener(
+
+    "beforeunload",
+
+    e=>{
+
+        if(records.length===0)
+
         return;
 
-    e.preventDefault();
+        e.preventDefault();
 
-    e.returnValue = "";
+        e.returnValue="";
 
-});
+    }
+
+);
