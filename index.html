@@ -3,52 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>장호 사진 접수</title>
+
   <link rel="stylesheet" href="style.css" />
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="app.js"></script>
 </head>
+
 <body>
+  <div class="app">
+    <h1>장호 사진 접수</h1>
 
-<div class="app">
-  <h1>장호 사진 접수</h1>
+    <section class="card camera-card">
+      <label class="photo-label">1. 사진 먼저 찍기</label>
 
-  <section class="card">
-    <label>성함</label>
-    <input id="nameInput" type="text" placeholder="예: 김영자" />
+      <input
+        id="photoInput"
+        class="hidden-input"
+        type="file"
+        accept="image/*"
+        capture="environment"
+      />
 
-    <label>마을</label>
-    <div class="village-grid">
-      <button data-village="장호1리">장호1리</button>
-      <button data-village="장호2리">장호2리</button>
-      <button data-village="용화1리">용화1리</button>
-      <button data-village="용화2리">용화2리</button>
-    </div>
+      <button id="photoBtn" class="photo-btn" type="button">
+        📷 사진 찍기
+      </button>
 
-    <label>도로명</label>
-    <select id="roadSelect">
-      <option value="">마을을 먼저 선택하세요</option>
-    </select>
+      <img id="preview" class="preview hidden" alt="사진 미리보기" />
+    </section>
 
-    <label>상세주소</label>
-    <input id="detailInput" type="text" placeholder="예: 12-3, 101호" />
+    <section id="formCard" class="card form-card disabled">
+      <label>2. 성함</label>
+      <input id="nameInput" type="text" placeholder="예: 김영자" />
 
-    <label>사진 촬영</label>
-    <input id="photoInput" type="file" accept="image/*" capture="environment" />
+      <label>3. 마을</label>
+      <div class="village-grid">
+        <button type="button" data-village="장호1리">장호1리</button>
+        <button type="button" data-village="장호2리">장호2리</button>
+        <button type="button" data-village="용화1리">용화1리</button>
+        <button type="button" data-village="용화2리">용화2리</button>
+      </div>
 
-    <img id="preview" class="preview hidden" />
+      <label>4. 도로명</label>
+      <select id="roadSelect">
+        <option value="">마을을 먼저 선택하세요</option>
+      </select>
 
-    <button id="saveBtn" class="save">저장</button>
-  </section>
+      <label>5. 상세주소</label>
+      <input id="detailInput" type="text" placeholder="예: 12-3, 101호" />
 
-  <section class="card">
-    <div class="top-row">
-      <h2>저장 목록</h2>
-      <button id="csvBtn">CSV 다운로드</button>
-    </div>
+      <button id="saveBtn" class="save" type="button">저장</button>
 
-    <div id="list"></div>
-  </section>
-</div>
+      <p id="status"></p>
+    </section>
 
-<script src="app.js"></script>
+    <section class="card">
+      <div class="top-row">
+        <h2>저장 목록</h2>
+        <button id="csvBtn" type="button">CSV</button>
+      </div>
+
+      <input id="searchInput" type="text" placeholder="이름 검색" />
+
+      <div id="list"></div>
+    </section>
+  </div>
 </body>
 </html>
