@@ -1,44 +1,14 @@
 import {
   saveRecord,
   loadRecords,
-  uploadImage,
-  updateRecord,
-  deleteRecord
+  uploadImage
 } from "./firebase.js";
 
 const ADDRESS_DATA = {
-  "장호1리": [
-    "삼척로",
-    "장호길",
-    "장호1길",
-    "장호2길",
-    "장호항길",
-    "장호안1길",
-    "장호안2길"
-  ],
-  "장호2리": [
-    "삼척로",
-    "장호길",
-    "장호1길",
-    "장호2길",
-    "장호항길",
-    "장호안1길",
-    "장호안2길"
-  ],
-  "용화1리": [
-    "삼척로",
-    "용화길",
-    "용화해변길",
-    "용화해변1길",
-    "용화안길"
-  ],
-  "용화2리": [
-    "삼척로",
-    "용화길",
-    "용화해변길",
-    "용화해변1길",
-    "용화안길"
-  ]
+  "장호1리": ["장호항길", "장호1길", "장호안길", "삼척로"],
+  "장호2리": ["장호길", "장호2길", "삼척로"],
+  "용화1리": ["용화길", "용화안길", "용화해변길", "삼척로"],
+  "용화2리": ["용화해변1길", "용화해변2길", "삼척로"]
 };
 
 const photoBtn = document.getElementById("photoBtn");
@@ -58,8 +28,6 @@ const searchInput = document.getElementById("searchInput");
 let selectedVillage = "";
 let selectedFile = null;
 let records = [];
-let editingId = null;
-let editingImageUrl = "";
 
 init();
 
@@ -69,25 +37,32 @@ function init() {
   bindSave();
   bindCSV();
   bindSearch();
-  bindListActions();
   refreshRecords();
 }
 
 function bindPhoto() {
-  photoBtn.addEventListener("click", () => photoInput.click());
+  photoBtn.addEventListener("click", () => {
+    photoInput.click();
+  });
 
   photoInput.addEventListener("change", () => {
     const file = photoInput.files[0];
+
     if (!file) return;
 
     selectedFile = file;
+
     preview.src = URL.createObjectURL(file);
     preview.classList.remove("hidden");
+
     formCard.classList.remove("disabled");
 
     setTimeout(() => {
       nameInput.focus();
-      formCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      formCard.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     }, 200);
   });
 }
@@ -95,28 +70,20 @@ function bindPhoto() {
 function bindVillageButtons() {
   document.querySelectorAll(".village-grid button").forEach(btn => {
     btn.addEventListener("click", () => {
-      selectVillage(btn.dataset.village);
+      selectedVillage = btn.dataset.village;
+
+      document.querySelectorAll(".village-grid button").forEach(b => {
+        b.classList.remove("active");
+      });
+
+      btn.classList.add("active");
+      renderRoads();
     });
   });
 }
 
-function selectVillage(village) {
-  selectedVillage = village;
-
-  document.querySelectorAll(".village-grid button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.village === village);
-  });
-
-  renderRoads();
-}
-
 function renderRoads() {
   roadSelect.innerHTML = "";
-
-  if (!selectedVillage || !ADDRESS_DATA[selectedVillage]) {
-    roadSelect.innerHTML = `<option value="">마을을 먼저 선택하세요</option>`;
-    return;
-  }
 
   ADDRESS_DATA[selectedVillage].forEach(road => {
     const option = document.createElement("option");
@@ -132,47 +99,37 @@ function bindSave() {
     const road = roadSelect.value;
     const detail = detailInput.value.trim();
 
+    if (!selectedFile) return alert("사진을 먼저 촬영하세요.");
     if (!name) return alert("성함을 입력하세요.");
     if (!selectedVillage) return alert("마을을 선택하세요.");
     if (!road) return alert("도로명을 선택하세요.");
 
-    if (!editingId && !selectedFile) {
-      return alert("사진을 먼저 촬영하세요.");
-    }
-
     try {
       saveBtn.disabled = true;
-      saveBtn.textContent = editingId ? "수정 중..." : "저장 중...";
+      saveBtn.textContent = "저장 중...";
+      statusEl.textContent = "사진 업로드 중...";
 
-      let imageUrl = editingImageUrl;
+      const imageUrl = await uploadImage(selectedFile);
 
-      if (selectedFile) {
-        statusEl.textContent = "사진 업로드 중...";
-        imageUrl = await uploadImage(selectedFile);
-      }
+      statusEl.textContent = "정보 저장 중...";
 
-      statusEl.textContent = editingId ? "수정 저장 중..." : "정보 저장 중...";
-
-      const data = {
+      await saveRecord({
         name,
         village: selectedVillage,
         road,
         detail,
         imageUrl
-      };
+      });
 
-      if (editingId) {
-        await updateRecord(editingId, data);
-        statusEl.textContent = "수정 완료";
-      } else {
-        await saveRecord(data);
-        statusEl.textContent = "저장 완료";
-      }
+      statusEl.textContent = "저장 완료";
 
       resetForm();
       await refreshRecords();
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
 
     } catch (err) {
       console.error(err);
@@ -185,70 +142,9 @@ function bindSave() {
   });
 }
 
-function bindListActions() {
-  list.addEventListener("click", async e => {
-    const editBtn = e.target.closest(".edit-btn");
-    const deleteBtn = e.target.closest(".delete-btn");
-
-    if (editBtn) {
-      startEdit(editBtn.dataset.id);
-    }
-
-    if (deleteBtn) {
-      await removeItem(deleteBtn.dataset.id);
-    }
-  });
-}
-
-function startEdit(id) {
-  const record = records.find(r => r.id === id);
-  if (!record) return;
-
-  editingId = record.id;
-  editingImageUrl = record.imageUrl || "";
-  selectedFile = null;
-
-  nameInput.value = record.name || "";
-  detailInput.value = record.detail || "";
-
-  selectVillage(record.village || "");
-  roadSelect.value = record.road || "";
-
-  if (editingImageUrl) {
-    preview.src = editingImageUrl;
-    preview.classList.remove("hidden");
-  }
-
-  formCard.classList.remove("disabled");
-  saveBtn.textContent = "수정 저장";
-  photoBtn.textContent = "📷 사진 변경";
-
-  formCard.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-async function removeItem(id) {
-  const record = records.find(r => r.id === id);
-  if (!record) return;
-
-  if (!confirm(`${record.name} 님 기록을 삭제할까요?`)) return;
-
-  try {
-    statusEl.textContent = "삭제 중...";
-    await deleteRecord(id);
-    statusEl.textContent = "삭제 완료";
-    await refreshRecords();
-  } catch (err) {
-    console.error(err);
-    alert("삭제 실패");
-    statusEl.textContent = "삭제 실패";
-  }
-}
-
 function resetForm() {
   selectedFile = null;
   selectedVillage = "";
-  editingId = null;
-  editingImageUrl = "";
 
   photoInput.value = "";
   preview.src = "";
@@ -264,9 +160,6 @@ function resetForm() {
   });
 
   formCard.classList.add("disabled");
-
-  saveBtn.textContent = "저장";
-  photoBtn.textContent = "📷 사진 찍기";
 }
 
 async function refreshRecords() {
@@ -291,15 +184,13 @@ function renderList(data) {
     const item = document.createElement("div");
     item.className = "item";
 
+    const time = formatTime(record.createdAt);
+
     item.innerHTML = `
       <strong>${escapeHTML(record.name)}</strong>
       <p>${escapeHTML(record.village)} ${escapeHTML(record.road)} ${escapeHTML(record.detail || "")}</p>
-      <p>${formatTime(record.createdAt)}</p>
+      <p>${time}</p>
       ${record.imageUrl ? `<img src="${record.imageUrl}" alt="사진">` : ""}
-      <div class="item-actions">
-        <button class="edit-btn" data-id="${record.id}">수정</button>
-        <button class="delete-btn" data-id="${record.id}">삭제</button>
-      </div>
     `;
 
     list.appendChild(item);
@@ -363,7 +254,10 @@ function formatTime(timestamp) {
   if (!timestamp) return "";
 
   try {
-    if (timestamp.toDate) return timestamp.toDate().toLocaleString("ko-KR");
+    if (timestamp.toDate) {
+      return timestamp.toDate().toLocaleString("ko-KR");
+    }
+
     return new Date(timestamp).toLocaleString("ko-KR");
   } catch {
     return "";

@@ -1,145 +1,74 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta charset="UTF-8">
+  <title>장호 사진 접수</title>
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="style.css" />
 
-    <title>장호리 사진 접수</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <script type="module" src="firebase.js"></script>
-    <script type="module" src="app.js"></script>
-
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="app.js"></script>
 </head>
 
 <body>
+  <div class="app">
+    <h1>장호 사진 접수</h1>
 
-    <div class="app">
+    <section class="card camera-card">
+      <label class="photo-label">1. 사진 먼저 찍기</label>
 
-        <h1>📷 장호리 사진 접수</h1>
+      <input
+        id="photoInput"
+        class="hidden-input"
+        type="file"
+        accept="image/*"
+        capture="environment"
+      />
 
-        <!-- 사진 -->
-        <section class="card camera-card">
+      <button id="photoBtn" class="photo-btn" type="button">
+        📷 사진 찍기
+      </button>
 
-            <button id="photoBtn" class="photo-btn">
-                📷 사진 찍기
-            </button>
+      <img id="preview" class="preview hidden" alt="사진 미리보기" />
+    </section>
 
-            <input
-                id="photoInput"
-                class="hidden-input"
-                type="file"
-                accept="image/*"
-                capture="environment">
+    <section id="formCard" class="card form-card disabled">
+      <label>2. 성함</label>
+      <input id="nameInput" type="text" placeholder="예: 김영자" />
 
-            <img
-                id="preview"
-                class="preview hidden"
-                alt="미리보기">
+      <label>3. 마을</label>
+      <div class="village-grid">
+        <button type="button" data-village="장호1리">장호1리</button>
+        <button type="button" data-village="장호2리">장호2리</button>
+        <button type="button" data-village="용화1리">용화1리</button>
+        <button type="button" data-village="용화2리">용화2리</button>
+      </div>
 
-        </section>
+      <label>4. 도로명</label>
+      <select id="roadSelect">
+        <option value="">마을을 먼저 선택하세요</option>
+      </select>
 
-        <!-- 입력 -->
-        <section
-            id="formCard"
-            class="card form-card disabled">
+      <label>5. 상세주소</label>
+      <input id="detailInput" type="text" placeholder="예: 12-3, 101호" />
 
-            <label>성함</label>
+      <button id="saveBtn" class="save" type="button">저장</button>
 
-            <input
-                id="nameInput"
-                type="text"
-                placeholder="성함 입력">
+      <p id="status"></p>
+    </section>
 
-            <label>마을</label>
+    <section class="card">
+      <div class="top-row">
+        <h2>저장 목록</h2>
+        <button id="csvBtn" type="button">CSV</button>
+      </div>
 
-            <div class="village-grid">
+      <input id="searchInput" type="text" placeholder="이름 검색" />
 
-                <button
-                    type="button"
-                    data-village="장호1리">
-                    장호1리
-                </button>
-
-                <button
-                    type="button"
-                    data-village="장호2리">
-                    장호2리
-                </button>
-
-                <button
-                    type="button"
-                    data-village="용화1리">
-                    용화1리
-                </button>
-
-                <button
-                    type="button"
-                    data-village="용화2리">
-                    용화2리
-                </button>
-
-            </div>
-
-            <label>도로명</label>
-
-            <select id="roadSelect">
-
-                <option value="">
-                    마을을 먼저 선택하세요
-                </option>
-
-            </select>
-
-            <label>상세주소</label>
-
-            <input
-                id="detailInput"
-                type="text"
-                placeholder="예) 25-3">
-
-            <button
-                id="saveBtn"
-                class="save">
-
-                저장
-
-            </button>
-
-            <p id="status"></p>
-
-        </section>
-
-        <!-- 목록 -->
-
-        <section class="card">
-
-            <div class="top-row">
-
-                <h2>저장 목록</h2>
-
-                <button id="csvBtn">
-                    CSV 다운로드
-                </button>
-
-            </div>
-
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="이름 / 마을 / 도로명 검색">
-
-            <div id="list"></div>
-
-        </section>
-
-    </div>
-
+      <div id="list"></div>
+    </section>
+  </div>
 </body>
-
 </html>
