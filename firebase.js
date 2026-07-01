@@ -7,7 +7,10 @@ import {
   serverTimestamp,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  doc,
+  updateDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import {
@@ -34,7 +37,8 @@ export const storage = getStorage(app);
 export async function saveRecord(data) {
   return await addDoc(collection(db, "jangho"), {
     ...data,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
   });
 }
 
@@ -46,10 +50,21 @@ export async function loadRecords() {
 
   const snap = await getDocs(q);
 
-  return snap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+  return snap.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
   }));
+}
+
+export async function updateRecord(id, data) {
+  return await updateDoc(doc(db, "jangho", id), {
+    ...data,
+    updatedAt: serverTimestamp()
+  });
+}
+
+export async function deleteRecord(id) {
+  return await deleteDoc(doc(db, "jangho", id));
 }
 
 export async function uploadImage(file) {
