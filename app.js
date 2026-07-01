@@ -190,15 +190,8 @@ function addCard(data) {
 }
 
 excelBtn.onclick = async () => {
-  if (records.length === 0) return alert("저장된 데이터가 없습니다.");
-
-  if (typeof ExcelJS === "undefined") {
-    alert("ExcelJS가 불러와지지 않았습니다. index.html의 ExcelJS CDN을 확인하세요.");
-    return;
-  }
-
-  if (typeof saveAs === "undefined") {
-    alert("FileSaver가 불러와지지 않았습니다. index.html의 FileSaver CDN을 확인하세요.");
+  if (records.length === 0) {
+    alert("저장된 데이터가 없습니다.");
     return;
   }
 
@@ -206,7 +199,7 @@ excelBtn.onclick = async () => {
   const sheet = workbook.addWorksheet("장호");
 
   sheet.columns = [
-    { header: "사진", width: 18 },
+    { header: "사진", width: 22 },
     { header: "성함", width: 15 },
     { header: "마을", width: 12 },
     { header: "도로명", width: 18 },
@@ -214,12 +207,13 @@ excelBtn.onclick = async () => {
     { header: "저장시간", width: 25 }
   ];
 
-  sheet.getRow(1).font = { bold: true, size: 13 };
+  sheet.getRow(1).font = { bold: true };
+  sheet.getRow(1).height = 24;
 
   let row = 2;
 
   for (const item of records) {
-    sheet.getRow(row).height = 90;
+    sheet.getRow(row).height = 110;
 
     sheet.getCell(`B${row}`).value = item.name;
     sheet.getCell(`C${row}`).value = item.village;
@@ -229,16 +223,13 @@ excelBtn.onclick = async () => {
 
     if (item.photo) {
       const imageId = workbook.addImage({
-
-          buffer: base64ToUint8Array(item.photo),
-
-          extension: "jpeg"
-
+        base64: item.photo,
+        extension: "jpeg"
       });
 
       sheet.addImage(imageId, {
-        tl: { col: 0.15, row: row - 0.85 },
-        ext: { width: 90, height: 90 }
+        tl: { col: 0, row: row - 1 },
+        ext: { width: 105, height: 105 }
       });
     }
 
@@ -247,14 +238,11 @@ excelBtn.onclick = async () => {
 
   const buffer = await workbook.xlsx.writeBuffer();
 
-  saveAs(
-    new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    }),
-    `장호사진_${todayString()}.xlsx`
-  );
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  });
 
-  alert("엑셀 저장 완료!");
+  saveAs(blob, `장호사진_${todayString()}.xlsx`);
 };
 
 function compressImage(file, maxWidth, quality) {
@@ -282,24 +270,6 @@ function compressImage(file, maxWidth, quality) {
 
     reader.readAsDataURL(file);
   });
-}
-
-function base64ToUint8Array(base64){
-
-    const binary = atob(base64.split(",")[1]);
-
-    const len = binary.length;
-
-    const bytes = new Uint8Array(len);
-
-    for(let i=0;i<len;i++){
-
-        bytes[i] = binary.charCodeAt(i);
-
-    }
-
-    return bytes;
-
 }
 
 function todayString() {
